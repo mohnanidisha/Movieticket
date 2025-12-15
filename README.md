@@ -16,5 +16,5 @@ Includes admin and user login, seat selection, and booking history.
 - VS Code
 
 ## How to Run
-1. Compile using g++
+1. Compile using c++
 2. Run the executable
