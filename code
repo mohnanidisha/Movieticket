@@ -1,0 +1,227 @@
+#include <iostream>
+ #include <vector>
+ #include <string>
+ #include <cstdlib>
+#include <map>
+ using namespace std;
+
+ class Person {
+ protected:
+     string name;
+     int age;
+     string phone;
+ public:
+     Person(string n, int a, string p) : name(n), age(a), phone(p) {}
+     virtual void displayDetails() {
+         cout << "Name: " << name << " | Age: " << age << " | Phone: " << phone << endl;
+     }
+     int getFirstNameLength() {
+         return name.find(' ') != string::npos ? name.find(' ') : name.length();
+     }
+ };
+
+
+ class User : public Person {
+ protected:
+     int loyaltyPoints;
+      public:
+  User(string n, int a, string p) : Person(n, a, p) {
+         loyaltyPoints = getFirstNameLength() * 10; // Loyalty points based on first name length
+     }
+     int getLoyaltyPoints() { return loyaltyPoints; }
+          virtual double applyDiscount(double price) {
+      return (loyaltyPoints > 50) ? price * 0.9 : price; // 10% discount if points > 50
+  }
+ };
+
+
+ class PremiumUser : public User {
+ public:
+     PremiumUser(string n, int a, string p) : User(n, a, p) {}
+    void displayDetails() override {
+       cout << "[Premium] ";
+Person::displayDetails();
+        cout << "VIP Benefits: Free Snacks, Lounge Access" << endl;
+}
+    double applyDiscount(double price) override {
+        return User::applyDiscount(price) * 0.95; // Additional 5% discount
+     }
+ };
+
+
+ class Reviews {
+    map<string, double> movieReviews;
+public:
+    Reviews() {
+        movieReviews["XYZ"] = 4.5;
+        movieReviews["WER"] = 3.0;
+        movieReviews["ABC"] = 4.0;
+    }
+    void addReview(string movie, double rating) { movieReviews[movie] = rating; }
+    void displayReviews() {
+        cout << "Movie Reviews:" << endl;
+        for (const auto& r : movieReviews) {
+            cout << "- " << r.first << " Review: " << r.second << "/5" << endl;
+        }
+    }
+};
+class Show {
+   vector<vector<char>> seats;
+ public:
+    Show() {
+        seats = vector<vector<char>>(5, vector<char>(5, 'O')); // 'O' for open seat
+    }
+    void displaySeats() {
+        cout << "\nSeat Layout (O: Open, X: Booked):\n";
+       for (int i = 0; i < 5; i++) {
+          for (int j = 0; j < 5; j++) {
+              cout << seats[i][j] << " ";
+           }
+            cout << endl;
+        }
+    }
+     bool bookSeat(int row, int col) {
+         if (seats[row][col] == 'O') {
+             seats[row][col] = 'X';
+             return true;
+         }
+         return false;
+     }
+ };
+
+ // Food Ordering System
+ class FoodMenu {
+ public:
+     void displayMenu() {
+         cout << "\nFood Menu:\n1. Popcorn - $5\n2. Nachos - $4\n3. Combo Meal - $8\n";
+     }
+     double getPrice(int choice) {
+         switch (choice) {
+             case 1: return 5;
+             case 2: return 4;
+             case 3: return 8;
+             default: return 0;
+         }
+     }
+ };
+
+
+ bool isTicketBooked(int ticketID) {
+    // Dummy booked tickets: 1, 2, 3 are booked
+    return (ticketID == 1 || ticketID == 2 || ticketID == 3);
+}
+
+void cancelTicket(int ticketID) {
+    try {
+        if (!isTicketBooked(ticketID)) {
+            throw "Ticket not found! Cannot cancel.";
+        }
+
+        // If ticket is found
+        cout << "✅ Ticket #" << ticketID << " cancelled successfully.\n";
+        cout << "💰 Refund will be processed shortly.\n";
+
+    } catch (const char* msg) {
+        cout << "❌ Error: " << msg << endl;
+    }
+}
+
+
+class Payment {
+ public:
+     static void processPayment(string method, double amount) {
+         cout << "Processing " << method << " payment of $" << amount << "... Payment Successful!" << endl;
+     }
+ };
+
+ int main() {
+    char choice;
+     string name,phone;
+     int age,userType;
+     Reviews reviews;
+     string username, password;
+     string correctUsername = "admin";
+     string correctPassword = "pass123";
+ 
+     cout<<"Enter your username";
+     cin>>username;
+     cout<<"Enter password for the process to continue";
+     cin>>password;
+     if(username == correctUsername && password == correctPassword) {
+        cout<<"proceed ahead";
+        cout<<"---WELCOME TO THE MOVIE TICKET BOOKING SYSTEM---";
+        cout << "Available Movies:\n1. XYZ\n2. WER\n3. ABC\n";
+        reviews.displayReviews();
+    
+       
+        cout << "Enter your name: ";
+        fflush(stdin);
+        getline(cin, name);
+
+        cout << "Enter your age: ";
+        cin >> age;
+        cin.ignore(); // Clear input buffer
+        cout << "Enter your phone number: ";
+        getline(cin, phone);
+            cout << "Are you a Premium User? (1 for Yes, 0 for No): ";
+      cin >> userType;
+       
+        User *user;
+        if (userType == 1) {
+            user = new PremiumUser(name, age, phone);
+        } else {
+            user = new User(name, age, phone);
+        }
+        Show show;
+        FoodMenu food;
+       
+        cout << "Welcome to the Movie Booking System!" << endl;
+        user->displayDetails();
+        cout << "Loyalty Points: " << user->getLoyaltyPoints() << endl;
+   
+        show.displaySeats();
+        int row, col;
+        cout << "Enter row and column to book a seat (0-4 0-4): ";
+        cin >> row >> col;
+        cout << "Booking seat... " << (show.bookSeat(row, col) ? "Success!" : "Failed!") << endl;
+        show.displaySeats();
+   
+        char foodChoice;
+        cout << "Do you want to order food? (y/n): ";
+        cin >> foodChoice;
+       double foodPrice = 0;
+        if (foodChoice == 'y' || foodChoice == 'Y') {
+            food.displayMenu();
+                     int choice;
+     cout << "Enter your food choice (1-3): ";
+            cin >> choice;
+            foodPrice = food.getPrice(choice);
+        }
+       
+        double price = 100 + foodPrice; // Base ticket price + food price
+        cout << "Total price after discount: $" << user->applyDiscount(price) << endl;
+       
+        string paymentMethod;
+        cout << "Enter payment method (Card/UPI/Wallet/Cash): ";
+             cin >> paymentMethod;
+     Payment::processPayment(paymentMethod, user->applyDiscount(price));
+
+     cout << "Do you want to cancel your ticket? (y/n): ";
+     cin >> choice;
+ 
+     if (choice == 'y' || choice == 'Y') {
+         int ticketID;
+         cout << "Enter your ticket ID to cancel: ";
+         cin >> ticketID;
+         cancelTicket(ticketID);
+     } else {
+         cout << "Okay! Your ticket remains booked. Enjoy the show! \n";
+     } 
+        delete user;
+        return true;
+     } else {
+        cout<<"invalid";
+        return false;
+     }
+     return 0;
+ }
